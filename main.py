@@ -7,7 +7,6 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QComboBox, QProgressBar, QMessageBox, 
                              QFileDialog, QRadioButton, QButtonGroup, QMenuBar,
                              QDialog, QCheckBox, QGroupBox)
-from updater import UpdaterDialog
 from PyQt6.QtCore import Qt, QThread, pyqtSignal, QTimer, QUrl
 from PyQt6.QtGui import QFont, QAction, QPixmap, QPalette, QBrush
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
@@ -24,10 +23,6 @@ TRANSLATIONS = {
         'menu_exit': 'Exit',
         'menu_help': 'Help',
         'menu_about': 'About',
-        'menu_update': 'Check for Updates',
-        'menu_update_en': 'Check for Updates',
-        'menu_update_ru': 'Проверить обновления',
-        'menu_update_uk': 'Перевірити оновлення',
         'url_label': 'URL:',
         'url_placeholder': 'https://youtube.com/watch?v=...',
         'video': 'Video',
@@ -552,12 +547,6 @@ class YUdlDownloader(QMainWindow):
         # Меню Help
         help_menu = menubar.addMenu(self.tr('menu_help'))
         
-        update_action = QAction(self.tr('menu_update'), self)
-        update_action.triggered.connect(self.check_for_updates)
-        help_menu.addAction(update_action)
-        
-        help_menu.addSeparator()
-        
         about_action = QAction(self.tr('menu_about'), self)
         about_action.triggered.connect(self.show_about)
         help_menu.addAction(about_action)
@@ -689,11 +678,6 @@ class YUdlDownloader(QMainWindow):
             self.tr('about_title'),
             self.tr('about_text')
         )
-    
-    def check_for_updates(self):
-        """Проверка обновлений"""
-        dialog = UpdaterDialog(self)
-        dialog.exec()
     
     def choose_folder(self):
         """Выбор папки для сохранения"""
