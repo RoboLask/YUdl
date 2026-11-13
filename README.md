@@ -1,288 +1,167 @@
-================================================================================
-                    YUdl - Загрузчик видео с YouTube
-================================================================================
+# YUdl
 
-Версия 1.0.1 | (c) 2026 msx
+**English** | [Українська](README.uk.md)
 
-Простая программа для скачивания видео и аудио с YouTube.
+![Version](https://img.shields.io/badge/version-1.0.1-blue)
+![Python](https://img.shields.io/badge/python-3.8%2B-3776AB?logo=python&logoColor=white)
+![PyQt6](https://img.shields.io/badge/PyQt-6-41CD52?logo=qt&logoColor=white)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)
 
-================================================================================
-УСТАНОВКА
-================================================================================
+**YouTube downloader with a graphical interface.** Python + PyQt6 + yt-dlp.
+Paste a link, pick a format, press download — that's it.
 
-1. Распакуйте архив в любую папку
+Version **1.0.1** · author **msx** · © 2026
 
-================================================================================
-УСТАНОВКА PYTHON
-================================================================================
+## Features
 
-Если программа не запускается, возможно у вас не установлен Python.
+- Simple window: link → Video / Audio → quality or format → progress.
+- **Video** — MP4 in Best, 720p or 480p.
+- **Audio** — MP3 320 kbps, WAV, FLAC or M4A.
+- Progress bar and a **STOP** button.
+- Interface languages: **English**, **Русский**, **Українська**.
+- Background music toggle.
+- FFmpeg is bundled in the `ffmpeg/` folder — no manual setup.
+- Built-in update checker for new GitHub releases.
+- Download folder is selectable and remembered.
 
-КАК ПРОВЕРИТЬ УСТАНОВЛЕН ЛИ PYTHON
+## Requirements
 
-1. Нажмите Win + R
-2. Введите cmd и нажмите Enter
-3. Введите команду:
+- Windows 10 / 11 (also runs on Linux and macOS)
+- Python **3.8+**
+- Internet connection
 
+## Installation
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/RoboLask/YUdl
+cd YUdl
+```
+
+### 2. Check Python
+
+```bash
 python --version
+```
 
-Если вы видите что-то вроде:
+If Python is missing, install it from [python.org](https://www.python.org/downloads/)
+and tick **Add Python to PATH** during installation.
 
-Python 3.10.5
+### 3. Install dependencies
 
-— значит Python уже установлен.
-
-Если появляется ошибка — установите Python.
-
---------------------------------------------------------------------------------
-
-КАК УСТАНОВИТЬ PYTHON
-
-Шаг 1: Скачайте Python
-Перейдите на официальный сайт:
-https://www.python.org/downloads/
-
-Нажмите кнопку:
-Download Python (последняя версия)
-
-Рекомендуемая версия: Python 3.8 или выше
-
---------------------------------------------------------------------------------
-
-Шаг 2: Запустите установщик
-
-ВАЖНО!
-Перед нажатием Install обязательно поставьте галочку:
-
-[✓] Add Python to PATH
-
-Затем нажмите:
-Install Now
-
---------------------------------------------------------------------------------
-
-Шаг 3: Проверьте установку
-
-После установки:
-
-1. Желательно перезагрузить компьютер
-2. Откройте cmd
-3. Введите:
-
-python --version
-
-Если версия отображается — всё готово.
-
-Если команда python не работает, попробуйте:
-
-py --version
-
-================================================================================
-УСТАНОВКА БИБЛИОТЕК (requirements.txt)
-================================================================================
-
-Для работы программы нужно установить библиотеки.
-
-В папке с программой есть файл:
-requirements.txt
-
-Шаг 1: Откройте командную строку
-
-1. Зажмите Shift
-2. Кликните правой кнопкой мыши по папке с программой
-3. Выберите "Открыть окно команд" или "Открыть PowerShell здесь"
-
-ИЛИ
-
-Откройте cmd и перейдите в папку командой:
-
-cd путь_к_папке
-
-Пример:
-
-cd C:\Users\ВашеИмя\Downloads\YUdl
-
---------------------------------------------------------------------------------
-
-Шаг 2: Установите библиотеки
-
-Введите команду:
-
+```bash
 pip install -r requirements.txt
+```
 
-Если pip не работает, попробуйте:
+If `pip` is not found:
 
+```bash
 python -m pip install -r requirements.txt
+```
 
-Дождитесь окончания установки.
+### 4. Run
 
---------------------------------------------------------------------------------
+```bash
+python main.py
+```
 
-Если появляется ошибка:
+On Windows you can also just double-click `main.py`.
 
-• Проверьте что Python добавлен в PATH
-• Проверьте что вы находитесь в правильной папке
-• Попробуйте запустить cmd от имени администратора
+On Linux / macOS:
 
-================================================================================
-КАК ПОЛЬЗОВАТЬСЯ
-================================================================================
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+./run.sh
+```
 
-Шаг 1: Запустите программу
-    Двойной клик на main.py (или запустите через Python)
+## Usage
 
-Шаг 2: Вставьте ссылку
-    Скопируйте URL видео с YouTube и вставьте в поле "URL"
-    Например: https://youtube.com/watch?v=dQw4w9WgXcQ
+1. Paste a YouTube link into the **URL** field.
+2. Choose **Video** or **Audio**.
+3. Pick the quality (Best / 720p / 480p) or the audio format.
+4. Select the download folder if needed — the default is your **Downloads**.
+5. Press **DOWNLOAD** and wait for the progress bar to finish.
 
-Шаг 3: Выберите что скачать
+## Formats
 
-    VIDEO - скачать видео с звуком
-        • Best - максимальное качество
-        • Medium (720p) - среднее качество (HD)
-        • Low (480p) - низкое качество (меньше размер)
+| Type | Options | Notes |
+|---|---|---|
+| Video | Best, 720p, 480p | MP4, merged with FFmpeg |
+| Audio | MP3 | 320 kbps, plays everywhere |
+| Audio | WAV | uncompressed, large files |
+| Audio | FLAC | lossless |
+| Audio | M4A | good for iPhone / iTunes |
 
-    AUDIO - скачать только музыку
-        • MP3 - обычный формат (рекомендуется)
-        • WAV - высокое качество, большой размер
-        • FLAC - высокое качество, меньше размер
-        • M4A - для iPhone/iTunes
+## Settings
 
-Шаг 4: Выберите папку (опционально)
-    По умолчанию файлы сохраняются в папку "Загрузки"
-    Чтобы изменить - нажмите кнопку "..."
+Open **File → Settings**:
 
-Шаг 5: Нажмите DOWNLOAD
-    Дождитесь окончания загрузки. Готово!
+- **Background music** — turn the built-in music on or off.
+- **Language** — English, Русский or Українська.
 
-================================================================================
-НАСТРОЙКИ
-================================================================================
+Settings are stored in `~/.yudl_settings.json`:
 
-File -> Settings
+```json
+{
+  "music": true,
+  "output_path": "C:/Users/me/Downloads",
+  "language": "en"
+}
+```
 
-Фоновая музыка
-    Включить/выключить музыку в программе
+| Field | What it sets | Options |
+|---|---|---|
+| `music` | background music | `true`, `false` |
+| `output_path` | download folder | any folder |
+| `language` | interface language | `en`, `ru`, `uk` |
 
-Язык
-    • English (по умолчанию)
-    • Русский
-    • Українська
+## Project structure
 
-    После смены языка перезапустите программу
-================================================================================
-ПРИМЕРЫ
-================================================================================
+```
+main.py           window, download logic and translations
+updater.py        update checker for GitHub releases
+requirements.txt  Python dependencies
+run.sh            Linux / macOS launcher (uses venv)
+1.wav             background music
+ffmpeg/           bundled FFmpeg binaries
+```
 
-Пример 1: Скачать музыкальный клип
-    1. Вставьте ссылку на YouTube
-    2. Выберите: Video
-    3. Качество: Medium (720p)
-    4. Нажмите DOWNLOAD
+## Troubleshooting
 
-Пример 2: Скачать музыку из видео
-    1. Вставьте ссылку на YouTube
-    2. Выберите: Audio
-    3. Формат: MP3
-    4. Нажмите DOWNLOAD
+**`python` is not recognized**
 
-Пример 3: Скачать в другую папку
-    1. Нажмите кнопку "..." рядом с путем
-    2. Выберите папку
-    3. Вставьте ссылку и скачайте
+Python is not in `PATH`. Reinstall it with **Add Python to PATH**, or try:
 
-================================================================================
-ЧАСТЫЕ ВОПРОСЫ
-================================================================================
+```bash
+py main.py
+```
 
-Где сохраняются файлы?
-    По умолчанию в папку "Загрузки" на вашем компьютере.
-    Полный путь показан в программе, например:
-    C:\Users\ВашеИмя\Downloads
+**`pip` is not recognized**
 
-Какой формат выбрать для музыки?
-    • MP3 - работает везде (телефон, плеер, машина)
-    • FLAC - если нужно лучшее качество
-    • M4A - если у вас iPhone
+```bash
+python -m pip install -r requirements.txt
+```
 
-Можно ли остановить загрузку?
-    Да, нажмите кнопку STOP
+**FFmpeg not found**
 
-Загрузка зависла на 95%
-    Это нормально! Программа конвертирует файл.
-    Подождите 1-2 минуты, она закончит.
+Make sure the `ffmpeg/bin/` folder contains `ffmpeg.exe` and `ffprobe.exe`.
 
-Программа не запускается
-    • Убедитесь что у вас Windows 10 или Windows 11
-    • Установлен Python 3.8 или выше
-    • Установлены все библиотеки (см. requirements.txt)
+**Download seems stuck at 95%**
 
-================================================================================
-ВОЗМОЖНЫЕ ОШИБКИ
-================================================================================
+This is normal — FFmpeg is converting the file. Wait a minute or two.
 
-"Enter YouTube URL!"
-    Вы забыли вставить ссылку в поле URL
+**Invalid YouTube URL**
 
-"Invalid YouTube URL!"
-    Ссылка неправильная. Проверьте что она выглядит так:
-    • https://youtube.com/watch?v=...
-    • https://youtu.be/...
+Use a link like `https://youtube.com/watch?v=...` or `https://youtu.be/...`.
 
-"FFmpeg not found!"
-    Проверьте что папка ffmpeg на месте рядом с программой.
-    Внутри должна быть папка bin с файлами ffmpeg.exe и ffprobe.exe
+## Legal
 
-Ошибка при скачивании
-    Возможные причины:
-    • Нет интернета
-    • Видео удалено с YouTube
-    • Видео недоступно в вашей стране
-    • Видео с возрастными ограничениями
+This program is for **personal use only**. Respect YouTube's Terms of Service
+and copyright law. You are responsible for what you download.
 
-    Что делать:
-    1. Проверьте интернет
-    2. Откройте эту ссылку в браузере - работает ли видео?
-    3. Попробуйте другое видео
+---
 
-================================================================================
-ВАЖНО
-================================================================================
-
-ЛЕГАЛЬНОСТЬ
-    Эта программа предназначена только для личного использования.
-
-    Можно: скачивать свою музыку, бесплатные видео, контент без копирайта
-    Нельзя: скачивать чужую музыку для продажи или публикации
-
-    Вы несете ответственность за то, что скачиваете!
-
-АВТОРСКИЕ ПРАВА
-    Соблюдайте правила YouTube и законы об авторских правах.
-    Не используйте программу для нарушения чужих прав.
-
-================================================================================
-СОВЕТЫ
-================================================================================
-
-Для экономии места на диске
-    Выбирайте Low (480p) для видео или MP3 для аудио
-
-Для лучшего качества
-    Выбирайте Best для видео или FLAC для аудио
-
-Для быстрого скачивания
-    Используйте Audio вместо Video - скачается быстрее
-
-Для телефона
-    MP3 или M4A - оба формата отлично работают
-
-================================================================================
-
-Версия: 1.0.1
-Разработчик: msx
-Год: 2026
-
-Приятного использования!
-
-================================================================================
+© 2026 msx
