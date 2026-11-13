@@ -40,6 +40,7 @@ TRANSLATIONS = {
         'download_btn': 'DOWNLOAD',
         'stop_btn': 'STOP',
         'initializing': 'Initializing...',
+        'ffmpeg_download': 'Downloading FFmpeg',
         'converting': 'Converting...',
         'complete': 'Complete',
         'stopped': 'Stopped',
@@ -55,7 +56,7 @@ TRANSLATIONS = {
         'language': 'Language:',
         'close_btn': 'Close',
         'about_title': 'About YUdl',
-        'about_text': 'YUdl - YouTube Downloader\n\nVersion 1.0.1\n\n© 2026 msx. All rights reserved.\n\nDownload videos and audio from YouTube\nwith customizable settings!',
+        'about_text': 'YUdl - YouTube Downloader\n\nVersion 1.0.2\n\n© 2026 msx. All rights reserved.\n\nDownload videos and audio from YouTube\nwith customizable settings!',
         'warning': 'Warning',
         'select_folder': 'Select Download Folder'
     },
@@ -78,6 +79,7 @@ TRANSLATIONS = {
         'download_btn': 'СКАЧАТЬ',
         'stop_btn': 'СТОП',
         'initializing': 'Инициализация...',
+        'ffmpeg_download': 'Загрузка FFmpeg',
         'converting': 'Конвертация...',
         'complete': 'Завершено',
         'stopped': 'Остановлено',
@@ -93,7 +95,7 @@ TRANSLATIONS = {
         'language': 'Язык:',
         'close_btn': 'Закрыть',
         'about_title': 'О программе YUdl',
-        'about_text': 'YUdl - Загрузчик с YouTube\n\nВерсия 1.0.1\n\n© 2026 msx. Все права защищены.\n\nЗагружайте видео и аудио с YouTube\nс настраиваемыми параметрами!',
+        'about_text': 'YUdl - Загрузчик с YouTube\n\nВерсия 1.0.2\n\n© 2026 msx. Все права защищены.\n\nЗагружайте видео и аудио с YouTube\nс настраиваемыми параметрами!',
         'warning': 'Предупреждение',
         'select_folder': 'Выберите папку для загрузки'
     },
@@ -116,6 +118,7 @@ TRANSLATIONS = {
         'download_btn': 'ЗАВАНТАЖИТИ',
         'stop_btn': 'СТОП',
         'initializing': 'Ініціалізація...',
+        'ffmpeg_download': 'Завантаження FFmpeg',
         'converting': 'Конвертація...',
         'complete': 'Завершено',
         'stopped': 'Зупинено',
@@ -131,52 +134,30 @@ TRANSLATIONS = {
         'language': 'Мова:',
         'close_btn': 'Закрити',
         'about_title': 'Про програму YUdl',
-        'about_text': 'YUdl - Завантажувач з YouTube\n\nВерсія 1.0.1\n\n© 2026 msx. Всі права захищені.\n\nЗавантажуйте відео та аудіо з YouTube\nз налаштуванням параметрів!',
+        'about_text': 'YUdl - Завантажувач з YouTube\n\nВерсія 1.0.2\n\n© 2026 msx. Всі права захищені.\n\nЗавантажуйте відео та аудіо з YouTube\nз налаштуванням параметрів!',
         'warning': 'Попередження',
         'select_folder': 'Виберіть папку для завантаження'
     }
 }
 
 
-# ================= FFmpeg finder =================
-import shutil
+# ================= FFmpeg =================
+# Поиск и автоскачивание FFmpeg живут в ffmpeg_setup.py
+from ffmpeg_setup import find_ffmpeg, ensure_ffmpeg, resource_path
 
-def find_ffmpeg():
-    """Ищет FFmpeg в нескольких возможных местах"""
-    base = os.path.dirname(os.path.abspath(__file__))
-    
-    is_windows = sys.platform.startswith('win')
-    ext = '.exe' if is_windows else ''
-    
-    # Возможные пути
-    paths = [
-        os.path.join(base, "ffmpeg", "bin"),
-        os.path.join(base, "ffmpeg"),
-        os.path.join(base, "bin"),
-        "/usr/local/bin",
-        "/usr/bin",
-    ]
-    
-    if is_windows:
-        paths.extend([
-            r"C:\ffmpeg\bin",
-            r"C:\Program Files\ffmpeg\bin",
-            r"C:\Program Files (x86)\ffmpeg\bin",
-        ])
-    
-    for p in paths:
-        ffmpeg_exe = os.path.join(p, f"ffmpeg{ext}")
-        ffprobe_exe = os.path.join(p, f"ffprobe{ext}")
-        
-        if os.path.isfile(ffmpeg_exe) and os.path.isfile(ffprobe_exe):
-            return p
-    
-    # Пробуем найти через shutil.which
-    ffmpeg_path = shutil.which('ffmpeg')
-    if ffmpeg_path:
-        return os.path.dirname(ffmpeg_path)
-    
-    return None
+
+class FFmpegThread(QThread):
+    """Докачивает FFmpeg в фоне, если его нет рядом с программой."""
+    progress = pyqtSignal(int)
+    finished = pyqtSignal(str)
+    error = pyqtSignal(str)
+
+    def run(self):
+        try:
+            folder = ensure_ffmpeg(lambda pct: self.progress.emit(pct))
+            self.finished.emit(folder)
+        except Exception as e:
+            self.error.emit(str(e))
 
 
 class DownloadThread(QThread):
@@ -228,14 +209,14 @@ class DownloadThread(QThread):
             if self.should_stop:
                 return
                 
-            # Находим FFmpeg
-            ffmpeg_path = find_ffmpeg()
-            
+            # Находим FFmpeg (при необходимости докачиваем)
+            ffmpeg_path = ensure_ffmpeg()
+
             if not ffmpeg_path:
                 raise Exception(
                     "FFmpeg not found!\n"
                     "Put ffmpeg in ffmpeg/bin next to the program."
-                )    
+                )
             ydl_opts = {
                 'progress_hooks': [self.progress_hook],
                 'outtmpl': os.path.join(self.output_path, '%(title)s.%(ext)s'),
@@ -491,6 +472,8 @@ class YUdlDownloader(QMainWindow):
     def __init__(self):
         super().__init__()
         self.download_thread = None
+        self.ffmpeg_thread = None
+        self.pending_download = None
         
         # Кроссплатформенный путь к Downloads
         home = os.path.expanduser('~')
@@ -730,10 +713,11 @@ class YUdlDownloader(QMainWindow):
         if not self.music_enabled:
             return
             
-        music_file = '1.wav'
-        
+        # resource_path находит 1.wav и рядом с программой, и внутри .exe
+        music_file = resource_path('1.wav')
+
         if os.path.exists(music_file):
-            self.music_player.setSource(QUrl.fromLocalFile(os.path.abspath(music_file)))
+            self.music_player.setSource(QUrl.fromLocalFile(music_file))
             self.music_player.play()
         
     def on_format_changed(self):
@@ -784,6 +768,37 @@ class YUdlDownloader(QMainWindow):
         self.stop_btn.setEnabled(True)
         self.progress_bar.setValue(0)
         self.display.setText(self.tr('initializing'))
+
+        # Если FFmpeg нет — сначала качаем его, потом начинаем загрузку
+        if not find_ffmpeg():
+            self.pending_download = (url, quality, format_type, audio_format)
+            self.progress_bar.setValue(0)
+            self.display.setText(self.tr('ffmpeg_download') + ' 0%')
+            self.ffmpeg_thread = FFmpegThread()
+            self.ffmpeg_thread.progress.connect(self.update_ffmpeg_progress)
+            self.ffmpeg_thread.finished.connect(self.ffmpeg_ready)
+            self.ffmpeg_thread.error.connect(self.download_error)
+            self.ffmpeg_thread.start()
+            return
+
+        self._start_download_thread(url, quality, format_type, audio_format)
+
+    def update_ffmpeg_progress(self, percent):
+        """Прогресс автоскачивания FFmpeg."""
+        self.progress_bar.setValue(percent)
+        self.display.setText(f"{self.tr('ffmpeg_download')} {percent}%")
+
+    def ffmpeg_ready(self, folder):
+        """FFmpeg скачан — запускаем саму загрузку."""
+        self.display.setText(self.tr('initializing'))
+        self.progress_bar.setValue(0)
+        if self.pending_download:
+            url, quality, format_type, audio_format = self.pending_download
+            self.pending_download = None
+            self._start_download_thread(url, quality, format_type, audio_format)
+
+    def _start_download_thread(self, url, quality, format_type, audio_format):
+        self.download_btn.setEnabled(False)
         
         self.download_thread = DownloadThread(url, quality, format_type, self.output_path, audio_format)
         self.download_thread.progress.connect(self.update_progress)
@@ -793,6 +808,16 @@ class YUdlDownloader(QMainWindow):
     
     def stop_download(self):
         """Остановка текущей загрузки"""
+        if getattr(self, 'ffmpeg_thread', None) and self.ffmpeg_thread.isRunning():
+            self.ffmpeg_thread.terminate()
+            self.ffmpeg_thread.wait(1000)
+            self.pending_download = None
+            self.display.setText(self.tr('stopped'))
+            self.progress_bar.setValue(0)
+            self.download_btn.setEnabled(True)
+            self.stop_btn.setEnabled(False)
+            QTimer.singleShot(2000, lambda: self.display.setText(self.tr('ready')))
+            return
         if self.download_thread and self.download_thread.isRunning():
             self.download_thread.stop()
             self.download_thread.wait(2000)  # Ждем 2 секунды

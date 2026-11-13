@@ -2,15 +2,20 @@
 
 **English** | [Українська](README.uk.md)
 
-![Version](https://img.shields.io/badge/version-1.0.1-blue)
+![Version](https://img.shields.io/badge/version-1.0.2-blue)
 ![Python](https://img.shields.io/badge/python-3.8%2B-3776AB?logo=python&logoColor=white)
 ![PyQt6](https://img.shields.io/badge/PyQt-6-41CD52?logo=qt&logoColor=white)
+![FFmpeg](https://img.shields.io/badge/FFmpeg-auto--download-007808?logo=ffmpeg&logoColor=white)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)
+
+<p align="center">
+  <img src="docs/screenshot.png" alt="YUdl screenshot" width="500">
+</p>
 
 **YouTube downloader with a graphical interface.** Python + PyQt6 + yt-dlp.
 Paste a link, pick a format, press download — that's it.
 
-Version **1.0.1** · author **msx** · © 2026
+Version **1.0.2** · author **msx** · © 2026
 
 ## Features
 
@@ -19,38 +24,22 @@ Version **1.0.1** · author **msx** · © 2026
 - **Audio** — MP3 320 kbps, WAV, FLAC or M4A.
 - Progress bar and a **STOP** button.
 - Interface languages: **English**, **Русский**, **Українська**.
+- **FFmpeg downloads itself** next to the program — nothing to install by hand.
 - Background music toggle.
-- FFmpeg is bundled in the `ffmpeg/` folder — no manual setup.
-- Built-in update checker for new GitHub releases.
 - Download folder is selectable and remembered.
 
-## Requirements
-
-- Windows 10 / 11 (also runs on Linux and macOS)
-- Python **3.8+**
-- Internet connection
-
-## Installation
+## Running
 
 ### 1. Clone the repository
 
 ```bash
 git clone https://github.com/RoboLask/YUdl
+```
+
+### 2. Go to the folder and install dependencies
+
+```bash
 cd YUdl
-```
-
-### 2. Check Python
-
-```bash
-python --version
-```
-
-If Python is missing, install it from [python.org](https://www.python.org/downloads/)
-and tick **Add Python to PATH** during installation.
-
-### 3. Install dependencies
-
-```bash
 pip install -r requirements.txt
 ```
 
@@ -60,7 +49,10 @@ If `pip` is not found:
 python -m pip install -r requirements.txt
 ```
 
-### 4. Run
+Python **3.8+** is required. If it is missing, install it from
+[python.org](https://www.python.org/downloads/) and tick **Add Python to PATH**.
+
+### 3. Run
 
 ```bash
 python main.py
@@ -68,14 +60,9 @@ python main.py
 
 On Windows you can also just double-click `main.py`.
 
-On Linux / macOS:
+On Linux / macOS use `python3 main.py` inside the virtual environment.
 
-```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-./run.sh
-```
+A ready-to-run Windows binary is in `bin/YUdl.exe` — no Python needed.
 
 ## Usage
 
@@ -94,6 +81,19 @@ pip install -r requirements.txt
 | Audio | WAV | uncompressed, large files |
 | Audio | FLAC | lossless |
 | Audio | M4A | good for iPhone / iTunes |
+
+## FFmpeg
+
+FFmpeg is not shipped in the repository — it is downloaded into the `ffmpeg/`
+folder next to the program if it is not found nearby or in `PATH`.
+
+- **Windows** — `github.com/yt-dlp/FFmpeg-Builds` (fallback: `github.com/BtbN/FFmpeg-Builds`)
+- **Linux** — `github.com/BtbN/FFmpeg-Builds` (fallback: `johnvansickle.com`)
+- **macOS** — `osxexperts.net`
+
+The progress is shown in the status area: `Downloading FFmpeg 42%`.
+Already have FFmpeg? Put `ffmpeg` and `ffprobe` into `ffmpeg/` next to the
+program and nothing will be downloaded.
 
 ## Settings
 
@@ -122,11 +122,12 @@ Settings are stored in `~/.yudl_settings.json`:
 
 ```
 main.py           window, download logic and translations
-updater.py        update checker for GitHub releases
+ffmpeg_setup.py   FFmpeg finder and auto-download
 requirements.txt  Python dependencies
-run.sh            Linux / macOS launcher (uses venv)
 1.wav             background music
-ffmpeg/           bundled FFmpeg binaries
+bin/              built binary
+ffmpeg/           downloaded FFmpeg (created automatically)
+docs/             screenshot
 ```
 
 ## Troubleshooting
@@ -145,9 +146,11 @@ py main.py
 python -m pip install -r requirements.txt
 ```
 
-**FFmpeg not found**
+**FFmpeg download fails**
 
-Make sure the `ffmpeg/bin/` folder contains `ffmpeg.exe` and `ffprobe.exe`.
+The program shows the error in the status area. Check your connection or a
+proxy / VPN, then press **DOWNLOAD** again. As a fallback, download FFmpeg
+manually and put `ffmpeg` and `ffprobe` into `ffmpeg/` next to the program.
 
 **Download seems stuck at 95%**
 

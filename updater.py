@@ -11,7 +11,7 @@ from PyQt6.QtWidgets import QDialog, QVBoxLayout, QLabel, QProgressBar, QPushBut
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 
 
-CURRENT_VERSION = "1.0.1"
+CURRENT_VERSION = "1.0.2"
 REPO_OWNER = "RoboLask"
 REPO_NAME = "YUdl"
 API_URL = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/releases/latest"

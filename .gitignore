@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# PyInstaller
+build/
+dist/
+*.spec
+
+# FFmpeg качается автоматически (см. ffmpeg_setup.py)
+ffmpeg/
+
+# Локальные окружения
+venv/
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db
